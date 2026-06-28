@@ -1,0 +1,68 @@
+name: Generate Expo App
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Create Expo project (manual)
+        run: |
+          mkdir innovacion-mobile
+          cd innovacion-mobile
+          pnpm init -y
+          pnpm add expo react react-native
+
+      - name: Add Expo template files
+        run: |
+          cd innovacion-mobile
+          cat > app.json << 'EOT'
+          {
+            "expo": {
+              "name": "innovacion-mobile",
+              "slug": "innovacion-mobile",
+              "version": "1.0.0",
+              "sdkVersion": "56.0.0"
+            }
+          }
+          EOT
+
+          cat > App.js << 'EOT'
+          import { Text, View } from 'react-native';
+          export default function App() {
+            return (
+              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <Text>Innovacion Mobile</Text>
+              </View>
+            );
+          }
+          EOT
+
+      - name: Install dependencies
+        run: |
+          cd innovacion-mobile
+          pnpm add axios socket.io-client
+
+      - name: Commit generated app
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add innovacion-mobile
+          git commit -m "Generated Expo app automatically"
+          git push
