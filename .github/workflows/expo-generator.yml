@@ -68,3 +68,4 @@ jobs:
           git add innovacion-mobile
           git commit -m "Generated Expo app automatically"
           git push
+
