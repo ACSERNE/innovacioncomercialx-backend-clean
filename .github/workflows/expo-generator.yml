@@ -1,6 +1,3 @@
-      - name: Disable sparse checkout
-        run: |
-          git config --global --unset-all core.sparseCheckout
 name: Generate Expo App
 
 on:
@@ -69,3 +66,4 @@ jobs:
           git add innovacion-mobile
           git commit -m "Generated Expo app automatically"
           git push
+
