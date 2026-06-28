@@ -1,0 +1,31 @@
+name: Expo Publish
+
+on:
+  workflow_dispatch:
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        working-directory: innovacion-mobile
+        run: pnpm install
+
+      - name: Install Expo CLI
+        run: npm install -g expo-cli
+
+      - name: Publish to Expo
+        working-directory: innovacion-mobile
+        run: expo publish --non-interactive
