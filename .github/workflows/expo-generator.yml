@@ -1,3 +1,6 @@
+      - name: Disable sparse checkout
+        run: |
+          git config --global --unset-all core.sparseCheckout
 name: Generate Expo App
 
 on:
