@@ -1,37 +1,79 @@
-name: Expo Android Build
+name: Generate Expo App
 
 on:
   workflow_dispatch:
 
 jobs:
-  build:
+  generate:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Node (24)
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
+      - name: Create Expo project folder
+        run: mkdir -p innovacion-mobile
 
-      - name: Enable Corepack
-        run: corepack enable
+      - name: Add Expo template files
+        run: |
+          cd innovacion-mobile
 
-      - name: Prepare pnpm
-        run: corepack prepare pnpm@latest --activate
+          cat > app.json << 'EOT'
+          {
+            "expo": {
+              "name": "innovacion-mobile",
+              "slug": "innovacion-mobile",
+              "version": "1.0.0",
+              "sdkVersion": "56.0.0",
+              "runtimeVersion": {
+                "policy": "sdkVersion"
+              }
+            }
+          }
+          EOT
 
-      - name: Install dependencies
-        working-directory: innovacion-mobile
-        run: pnpm install
+          cat > eas.json << 'EOT'
+          {
+            "build": {
+              "android": {
+                "buildType": "apk"
+              }
+            }
+          }
+          EOT
 
-      - name: Install EAS CLI
-        run: pnpm add -g eas-cli
+          cat > package.json << 'EOT'
+          {
+            "name": "innovacion-mobile",
+            "version": "1.0.0",
+            "main": "App.js",
+            "scripts": {
+              "start": "expo start"
+            },
+            "dependencies": {
+              "expo": "~56.0.0",
+              "react": "18.2.0",
+              "react-native": "0.76.0"
+            }
+          }
+          EOT
 
-      - name: Build Android APK
-        working-directory: innovacion-mobile
-        env:
-          EAS_TOKEN: ${{ secrets.EAS_TOKEN }}
-        run: eas build --platform android --profile production --non-interactive
+          cat > App.js << 'EOT'
+          import { Text, View } from 'react-native';
+          export default function App() {
+            return (
+              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+                <Text>Innovacion Mobile</Text>
+              </View>
+            );
+          }
+          EOT
+
+      - name: Commit generated files
+        run: |
+          git config user.name "ACSERNE"
+          git config user.email "actions@github.com"
+          git add innovacion-mobile
+          git commit -m "Generated Expo app automatically" || echo "No changes"
+          git push
 

@@ -1,0 +1,36 @@
+name: Expo Android Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Prepare pnpm
+        run: corepack prepare pnpm@latest --activate
+
+      - name: Install dependencies
+        working-directory: innovacion-mobile
+        run: pnpm install
+
+      - name: Install EAS CLI
+        run: pnpm add -g eas-cli
+
+      - name: Build Android APK
+        working-directory: innovacion-mobile
+        env:
+          EAS_TOKEN: ${{ secrets.EAS_TOKEN }}
+        run: eas build --platform android --non-interactive
