@@ -1,0 +1,28 @@
+name: Expo Android Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Setup Node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
+
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build Android APK
+        env:
+          EXPO_TOKEN: ${{ secrets.EAS_TOKEN }}
+        run: pnpm eas build --platform android --non-interactive
