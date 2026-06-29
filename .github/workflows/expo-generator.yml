@@ -1,10 +1,7 @@
-name: Generate Expo App
+name: Expo Android Build
 
 on:
   workflow_dispatch:
-
-permissions:
-  contents: write
 
 jobs:
   build:
@@ -25,47 +22,16 @@ jobs:
       - name: Prepare pnpm
         run: corepack prepare pnpm@latest --activate
 
-      - name: Create Expo project (manual)
-        run: |
-          mkdir innovacion-mobile
-          cd innovacion-mobile
-          pnpm init -y
-          pnpm add expo react react-native
-
-      - name: Add Expo template files
-        run: |
-          cd innovacion-mobile
-          cat > app.json << 'EOT'
-          {
-            "expo": {
-              "name": "innovacion-mobile",
-              "slug": "innovacion-mobile",
-              "version": "1.0.0",
-              "sdkVersion": "56.0.0"
-            }
-          }
-          EOT
-
-          cat > App.js << 'EOT'
-          import { Text, View } from 'react-native';
-          export default function App() {
-            return (
-              <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-                <Text>Innovacion Mobile</Text>
-              </View>
-            );
-          }
-          EOT
-
       - name: Install dependencies
         working-directory: innovacion-mobile
-        run: pnpm add axios socket.io-client
+        run: pnpm install
 
-      - name: Commit generated app
-        run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add innovacion-mobile
-          git commit -m "Generated Expo app automatically"
-          git push
+      - name: Install EAS CLI
+        run: pnpm add -g eas-cli
+
+      - name: Build Android APK
+        working-directory: innovacion-mobile
+        env:
+          EAS_TOKEN: ${{ secrets.EAS_TOKEN }}
+        run: eas build --platform android --profile production --non-interactive
 
