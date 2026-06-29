@@ -14,7 +14,7 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 24
+          node-version: 20
 
       - name: Enable Corepack
         run: corepack enable
@@ -26,11 +26,12 @@ jobs:
         working-directory: innovacion-mobile
         run: pnpm install
 
-      - name: Install EAS CLI
-        run: pnpm add -g eas-cli
+      - name: Install EAS CLI (local, no global)
+        working-directory: innovacion-mobile
+        run: pnpm add eas-cli
 
       - name: Build Android APK
         working-directory: innovacion-mobile
         env:
           EAS_TOKEN: ${{ secrets.EAS_TOKEN }}
-        run: eas build --platform android --non-interactive
+        run: pnpm eas build --platform android --non-interactive
